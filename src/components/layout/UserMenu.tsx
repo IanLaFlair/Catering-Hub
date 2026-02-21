@@ -4,7 +4,7 @@ import { User } from "next-auth";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { LogOut, User as UserIcon, LayoutDashboard, ChevronDown } from "lucide-react";
+import { LogOut, User as UserIcon, LayoutDashboard, ChevronDown, ClipboardList } from "lucide-react";
 
 interface UserMenuProps {
     user: User & { role?: string };
@@ -48,12 +48,12 @@ export default function UserMenu({ user }: UserMenuProps) {
                     </div>
 
                     <Link
-                        href="/dashboard"
+                        href="/pesanan"
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
                         onClick={() => setIsOpen(false)}
                     >
-                        <LayoutDashboard className="w-4 h-4" />
-                        Dashboard
+                        <ClipboardList className="w-4 h-4" />
+                        Riwayat Pesanan
                     </Link>
 
                     <Link

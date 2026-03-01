@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
@@ -13,10 +14,10 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     }
 
     return (
-        <>
+        <Suspense fallback={null}>
             <Navbar />
             <main className="pt-20">{children}</main>
             <Footer />
-        </>
+        </Suspense>
     );
 }

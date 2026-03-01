@@ -22,8 +22,8 @@ export default function NavbarClient({ user }: NavbarClientProps) {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-[100] w-full bg-white border-b border-[#f3ede7] shadow-sm">
-            <nav className="max-w-[1440px] mx-auto px-5 md:px-10">
+        <header className="fixed top-0 left-0 right-0 z-[9999] w-full bg-white border-b border-[#f3ede7] shadow-sm pointer-events-auto">
+            <nav className="relative max-w-[1440px] mx-auto px-5 md:px-10 z-[9999]">
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
@@ -72,21 +72,21 @@ export default function NavbarClient({ user }: NavbarClientProps) {
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="relative z-[10000] lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors pointer-events-auto"
                         onClick={() => setIsMobileOpen(!isMobileOpen)}
                         aria-label="Toggle menu"
                     >
                         {isMobileOpen ? (
-                            <X className="w-6 h-6 text-gray-700" />
+                            <X className="w-6 h-6 text-gray-700 pointer-events-none" />
                         ) : (
-                            <Menu className="w-6 h-6 text-gray-700" />
+                            <Menu className="w-6 h-6 text-gray-700 pointer-events-none" />
                         )}
                     </button>
                 </div>
 
                 {/* Mobile Menu */}
                 {isMobileOpen && (
-                    <div className="lg:hidden absolute top-[80px] left-0 w-full bg-white shadow-xl border-b border-gray-100 z-50 animate-fade-in">
+                    <div className="lg:hidden absolute top-[80px] left-0 w-full bg-white shadow-xl border-b border-gray-100 z-[9990] animate-fade-in pointer-events-auto max-h-[calc(100vh-80px)] overflow-y-auto">
                         <div className="flex flex-col gap-1 p-5">
                             {navLinks.map((link) => (
                                 <Link

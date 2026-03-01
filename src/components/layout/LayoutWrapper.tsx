@@ -15,7 +15,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     return (
         <>
             <Navbar />
-            <main>{children}</main>
+            <main className="pt-20">{children}</main>
             <Footer />
         </>
     );

@@ -22,7 +22,7 @@ export default function NavbarClient({ user }: NavbarClientProps) {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     return (
-        <header className="sticky top-0 z-[100] w-full bg-white border-b border-[#f3ede7]">
+        <header className="fixed top-0 left-0 right-0 z-[100] w-full bg-white border-b border-[#f3ede7] shadow-sm">
             <nav className="max-w-[1440px] mx-auto px-5 md:px-10">
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}

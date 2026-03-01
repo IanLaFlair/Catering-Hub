@@ -5,22 +5,39 @@ export const authConfig = {
         signIn: "/login",
     },
     callbacks: {
+        async jwt({ token, user }) {
+            if (user && 'role' in user) {
+                token.role = user.role;
+            }
+            return token;
+        },
+        async session({ session, token }) {
+            if (session.user && token.role) {
+                (session.user as any).role = token.role;
+            }
+            return session;
+        },
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
-            const isOnDashboard = nextUrl.pathname.includes("/dashboard");
+            const isOnDashboard = nextUrl.pathname.startsWith("/vendor-dashboard");
+
+            // Extract role from session or token
+            const role = (auth?.user as any)?.role;
 
             // Redirect unauthenticated users to login if accessing dashboard
             if (isOnDashboard) {
-                if (isLoggedIn) return true;
+                if (isLoggedIn) {
+                    if (role === 'VENDOR' || role === 'UMKM') return true;
+                    // Customers shouldn't access the vendor dashboard
+                    return Response.redirect(new URL("/", nextUrl));
+                }
                 return false; // Redirect unauthenticated users to login page
             } else if (isLoggedIn) {
                 // Redirect authenticated users away from login/register pages
                 if (nextUrl.pathname === "/login" || nextUrl.pathname === "/register") {
-                    // Default redirect could be home or role-specific dashboard
-                    // For now, let's keep it simple and redirect to home if already logged in? 
-                    // Or maybe dashboard if they have a role.
-                    // Leaving as is for now implies they can visit login page.
-                    // Better to redirect to dashboard if logged in.
+                    if (role === 'VENDOR' || role === 'UMKM') {
+                        return Response.redirect(new URL("/vendor-dashboard", nextUrl));
+                    }
                     return Response.redirect(new URL("/", nextUrl));
                 }
             }

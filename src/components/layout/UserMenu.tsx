@@ -46,15 +46,27 @@ export default function UserMenu({ user }: UserMenuProps) {
                         <p className="text-sm font-semibold text-gray-900">{user.name}</p>
                         <p className="text-xs text-gray-500 truncate">{user.email}</p>
                     </div>
+                    {(user.role === 'VENDOR' || user.role === 'UMKM') && (
+                        <Link
+                            href="/vendor-dashboard"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            <LayoutDashboard className="w-4 h-4" />
+                            Dashboard Toko
+                        </Link>
+                    )}
 
-                    <Link
-                        href="/pesanan"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
-                        onClick={() => setIsOpen(false)}
-                    >
-                        <ClipboardList className="w-4 h-4" />
-                        Riwayat Pesanan
-                    </Link>
+                    {(!user.role || user.role === 'CUSTOMER') && (
+                        <Link
+                            href="/pesanan"
+                            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            <ClipboardList className="w-4 h-4" />
+                            Riwayat Pesanan
+                        </Link>
+                    )}
 
                     <Link
                         href="/profile"

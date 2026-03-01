@@ -14,6 +14,7 @@ const loginSchema = z.object({
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
+    // @ts-expect-error - PrismaAdapter types clash with extended User model containing custom 'role' field
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
     providers: [

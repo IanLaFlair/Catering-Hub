@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import Link from "next/link";
 import { registerUser } from "../../actions";
@@ -28,7 +28,7 @@ function SubmitButton() {
     );
 }
 
-export default function RegisterFormPage() {
+function RegisterFormContent() {
     const searchParams = useSearchParams();
     const role = searchParams.get("role") || "CUSTOMER";
     const [state, dispatch] = useFormState(registerUser, null);
@@ -212,5 +212,13 @@ export default function RegisterFormPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function RegisterFormPage() {
+    return (
+        <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+            <RegisterFormContent />
+        </Suspense>
     );
 }

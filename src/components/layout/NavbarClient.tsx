@@ -111,14 +111,24 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                                             <p className="text-xs text-gray-500">{user.email}</p>
                                         </div>
                                     </div>
-
-                                    <Link
-                                        href="/pesanan"
-                                        className="py-2 text-sm font-medium text-gray-600 hover:text-primary"
-                                        onClick={() => setIsMobileOpen(false)}
-                                    >
-                                        Riwayat Pesanan
-                                    </Link>
+                                    {(user.role === 'VENDOR' || user.role === 'UMKM') && (
+                                        <Link
+                                            href="/vendor-dashboard"
+                                            className="py-2 text-sm font-medium text-gray-600 hover:text-primary"
+                                            onClick={() => setIsMobileOpen(false)}
+                                        >
+                                            Dashboard Toko
+                                        </Link>
+                                    )}
+                                    {(!user.role || user.role === 'CUSTOMER') && (
+                                        <Link
+                                            href="/pesanan"
+                                            className="py-2 text-sm font-medium text-gray-600 hover:text-primary"
+                                            onClick={() => setIsMobileOpen(false)}
+                                        >
+                                            Riwayat Pesanan
+                                        </Link>
+                                    )}
                                     <button
                                         onClick={() => signOut({ callbackUrl: "/" })}
                                         className="w-full text-left py-2 text-sm font-medium text-red-600 hover:text-red-700"

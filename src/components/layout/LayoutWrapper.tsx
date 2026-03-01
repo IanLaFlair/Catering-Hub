@@ -2,10 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
 
-export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
+export default function LayoutWrapper({ children, navbar, footer }: { children: React.ReactNode, navbar: React.ReactNode, footer: React.ReactNode }) {
     const pathname = usePathname();
     const isVendorDashboard = pathname?.startsWith("/vendor-dashboard");
 
@@ -15,9 +13,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
     return (
         <Suspense fallback={null}>
-            <Navbar />
+            {navbar}
             <main className="pt-20">{children}</main>
-            <Footer />
+            {footer}
         </Suspense>
     );
 }

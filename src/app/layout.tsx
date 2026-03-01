@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "CateringHub — Temukan Catering Terbaik untuk Acara Anda",
@@ -32,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
-        <LayoutWrapper>
+        <LayoutWrapper navbar={<Navbar />} footer={<Footer />}>
           {children}
         </LayoutWrapper>
       </body>

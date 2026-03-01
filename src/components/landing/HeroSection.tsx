@@ -1,4 +1,5 @@
 import { Search, MapPin, Users, CalendarDays } from "lucide-react";
+import Link from "next/link";
 
 export default function HeroSection() {
     return (
@@ -69,10 +70,12 @@ export default function HeroSection() {
 
                         {/* Button */}
                         <div className="flex md:col-span-1 h-full pt-6 md:pt-0">
-                            <button className="w-full h-12 bg-primary hover:bg-primary-hover text-white font-bold rounded-lg shadow-lg shadow-orange-200 transition-all flex items-center justify-center gap-2 active:scale-95">
-                                <Search className="w-5 h-5" />
-                                Cari Catering
-                            </button>
+                            <Link href="/cari" className="w-full">
+                                <button className="w-full h-12 bg-primary hover:bg-primary-hover text-white font-bold rounded-lg shadow-lg shadow-orange-200 transition-all flex items-center justify-center gap-2 active:scale-95">
+                                    <Search className="w-5 h-5" />
+                                    Cari Catering
+                                </button>
+                            </Link>
                         </div>
                     </div>
                 </div>

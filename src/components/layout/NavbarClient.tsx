@@ -86,8 +86,8 @@ export default function NavbarClient({ user }: NavbarClientProps) {
 
                 {/* Mobile Menu */}
                 {isMobileOpen && (
-                    <div className="lg:hidden pb-4 pt-2 border-t border-gray-100 animate-fade-in">
-                        <div className="flex flex-col gap-1">
+                    <div className="lg:hidden absolute top-[80px] left-0 w-full bg-white shadow-xl border-b border-gray-100 z-50 animate-fade-in">
+                        <div className="flex flex-col gap-1 p-5">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.href}
@@ -137,16 +137,18 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="flex gap-3 px-4 pt-2">
+                                <div className="flex flex-col gap-3 px-4 pt-2 pb-4">
                                     <Link
                                         href="/login"
-                                        className="flex-1 py-2.5 text-center text-sm font-semibold text-secondary border border-gray-200 rounded-lg hover:border-primary hover:text-primary transition-all"
+                                        onClick={() => setIsMobileOpen(false)}
+                                        className="w-full py-2.5 text-center text-sm font-semibold text-secondary border border-gray-200 rounded-lg hover:border-primary hover:text-primary transition-all"
                                     >
                                         Masuk
                                     </Link>
                                     <Link
                                         href="/register"
-                                        className="flex-1 py-2.5 text-center text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary-hover transition-all"
+                                        onClick={() => setIsMobileOpen(false)}
+                                        className="w-full py-2.5 text-center text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary-hover transition-all"
                                     >
                                         Daftar
                                     </Link>

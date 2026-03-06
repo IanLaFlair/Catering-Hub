@@ -102,16 +102,17 @@ export async function authenticate(
     formData: FormData,
 ) {
     try {
-        await signIn("credentials", formData);
+        await signIn("credentials", { ...Object.fromEntries(formData), redirectTo: "/" });
     } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
-                    return "Invalid credentials.";
+                    return "Email atau password salah. Silakan coba lagi.";
                 default:
-                    return "Something went wrong.";
+                    return "Terjadi kesalahan saat otentikasi.";
             }
         }
+        // Rethrow the error if it's a NEXT_REDIRECT error so Next.js handles it
         throw error;
     }
 }

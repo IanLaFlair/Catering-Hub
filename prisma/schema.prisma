@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -97,7 +97,7 @@ model VendorMenu {
   name            String
   description     String?
   category        String        // PRASMANAN, NASI_BOX, etc.
-  items           String        // Stored as JSON string for SQLite simplicity
+  items           Json
   pricePerPax     Int
   minOrderPax     Int
   image           String?
@@ -157,8 +157,10 @@ model CustomerOrder {
   eventType       String
   eventDate       DateTime
   guestCount      Int
-  status          String        // PENDING, CONFIRMED, etc.
+  status          String        // PENDING, CONFIRMED, PROCESSING, COMPLETED, CANCELLED
   totalAmount     Int?
+  duitkuReference String?
+  paidAt          DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 

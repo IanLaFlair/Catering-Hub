@@ -1,26 +1,51 @@
-'use client';
+import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
+import BookingClient from './BookingClient';
 
-import { useState } from 'react';
-import BookingStepper from '@/components/booking/BookingStepper';
-import MenuStep from '@/components/booking/MenuStep';
-import DetailStep from '@/components/booking/DetailStep';
-import ConfirmStep from '@/components/booking/ConfirmStep';
-import SuccessStep from '@/components/booking/SuccessStep';
+export default async function BookingPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ vendor?: string }>;
+}) {
+    const { vendor: slug } = await searchParams;
 
-export default function BookingPage() {
-    const [step, setStep] = useState(1);
+    if (!slug) redirect('/cari');
+
+    const vendor = await prisma.vendorProfile.findUnique({
+        where: { slug },
+        include: {
+            menus: {
+                where: { isAvailable: true },
+                orderBy: { category: 'asc' },
+            },
+        },
+    });
+
+    if (!vendor) redirect('/cari');
+
+    // Serialize untuk client component
+    const vendorData = {
+        id: vendor.id,
+        slug: vendor.slug,
+        businessName: vendor.businessName,
+        city: vendor.city ?? '',
+        rating: vendor.rating,
+        menus: vendor.menus.map((m) => ({
+            id: m.id,
+            name: m.name,
+            category: m.category,
+            description: m.description ?? '',
+            items: Array.isArray(m.items) ? (m.items as string[]) : [],
+            pricePerPax: m.pricePerPax,
+            minOrderPax: m.minOrderPax,
+            image: m.image,
+        })),
+    };
 
     return (
         <main className="min-h-screen bg-background-light">
             <div className="w-full max-w-[1440px] mx-auto px-4 lg:px-10 pb-20">
-                {/* Stepper — hide on success */}
-                {step <= 3 && <BookingStepper currentStep={step} />}
-
-                {/* Steps */}
-                {step === 1 && <MenuStep onNext={() => setStep(2)} />}
-                {step === 2 && <DetailStep onNext={() => setStep(3)} onBack={() => setStep(1)} />}
-                {step === 3 && <ConfirmStep onNext={() => setStep(4)} onBack={() => setStep(2)} />}
-                {step === 4 && <SuccessStep />}
+                <BookingClient vendor={vendorData} />
             </div>
         </main>
     );

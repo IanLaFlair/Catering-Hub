@@ -1,23 +1,40 @@
 import { Calendar, Users, MessageSquare, ReceiptText } from 'lucide-react';
 import Link from 'next/link';
 
-export default function QuotationSidebar() {
+interface QuotationSidebarProps {
+    vendorSlug: string;
+    priceMin: number | null;
+    priceMax: number | null;
+}
+
+function formatPrice(price: number) {
+    if (price >= 1_000_000) return `Rp ${(price / 1_000_000).toFixed(1).replace('.0', '')}jt`;
+    if (price >= 1_000) return `Rp ${(price / 1_000).toFixed(0)}k`;
+    return `Rp ${price.toLocaleString('id-ID')}`;
+}
+
+export default function QuotationSidebar({ vendorSlug, priceMin, priceMax }: QuotationSidebarProps) {
+    const priceRange = priceMin && priceMax
+        ? `${formatPrice(priceMin)} – ${formatPrice(priceMax)}/pax`
+        : priceMin
+        ? `Mulai ${formatPrice(priceMin)}/pax`
+        : 'Hubungi vendor';
+
     return (
         <div className="lg:col-span-4 relative h-full">
             <div className="sticky top-28 space-y-4">
-                {/* Quotation Card */}
                 <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-                    {/* Header */}
                     <div className="p-5 border-b border-gray-100 bg-accent/5">
                         <h3 className="font-bold text-lg text-accent flex items-center gap-2">
                             <ReceiptText className="w-5 h-5" />
                             Request Quotation
                         </h3>
-                        <p className="text-xs text-gray-500 mt-1">Dapatkan penawaran terbaik untuk acaramu.</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                            Harga: <span className="font-semibold text-accent">{priceRange}</span>
+                        </p>
                     </div>
 
                     <div className="p-5 space-y-4">
-                        {/* Date Picker */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1.5">Tanggal Acara</label>
                             <div className="relative">
@@ -31,7 +48,6 @@ export default function QuotationSidebar() {
                             </div>
                         </div>
 
-                        {/* Guest Count */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1.5">Jumlah Tamu</label>
                             <div className="relative">
@@ -46,33 +62,11 @@ export default function QuotationSidebar() {
                             </div>
                         </div>
 
-                        {/* Selected Items (Mini Cart) */}
-                        <div className="bg-background-light rounded-lg p-3 border border-gray-100">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Item Dipilih</span>
-                                <span className="text-xs text-primary cursor-pointer hover:underline">Edit</span>
-                            </div>
-                            <div className="space-y-2 max-h-40 overflow-y-auto hide-scrollbar">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-800 line-clamp-1">1x Paket Gold Prasmanan</span>
-                                    <span className="font-medium text-gray-600 text-xs whitespace-nowrap">@55rb</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-800 line-clamp-1">1x Zuppa Soup (100 pax)</span>
-                                    <span className="font-medium text-gray-600 text-xs whitespace-nowrap">@18rb</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Total + Buttons */}
                         <div className="border-t border-gray-100 pt-4 mt-2">
-                            <div className="flex justify-between items-center mb-1">
-                                <span className="text-sm text-gray-600">Estimasi Total</span>
-                                <span className="text-xl font-bold text-primary">Rp 5.500.000*</span>
-                            </div>
-                            <p className="text-[10px] text-gray-400 text-right mb-4">*Harga dapat berubah sesuai negosiasi</p>
-
-                            <Link href="/booking" className="block w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform active:scale-[0.98] mb-3 text-center">
+                            <Link
+                                href={`/booking?vendor=${vendorSlug}`}
+                                className="block w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all transform active:scale-[0.98] mb-3 text-center"
+                            >
                                 Kirim Request Quotation
                             </Link>
                             <button className="w-full bg-white border border-accent text-accent hover:bg-accent/5 font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
@@ -83,7 +77,6 @@ export default function QuotationSidebar() {
                     </div>
                 </div>
 
-                {/* Helper */}
                 <div className="text-center">
                     <p className="text-xs text-gray-400">
                         Butuh bantuan? <a className="text-accent underline" href="#">Hubungi CS CateringHub</a>

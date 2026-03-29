@@ -1,14 +1,18 @@
-import React from "react";
+'use client';
+
+import React, { useTransition } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { Loader2 } from "lucide-react";
 import ReviewModal from "./ReviewModal";
+import { submitReview, createPayment, getPaymentMethods } from "@/app/pesanan/actions";
 
 interface Order {
     id: string;
-    number: string;
+    orderNumber: string;
     vendorName: string;
-    vendorImage: string;
+    vendorImage: string | null;
     eventType: string;
     eventDate: string;
     status: string;
@@ -21,24 +25,52 @@ interface OrderCardProps {
 }
 
 const statusConfig: Record<string, { label: string; colorClass: string }> = {
-    menunggu_konfirmasi: { label: "Menunggu Konfirmasi", colorClass: "bg-orange-100 text-orange-700" },
-    diproses: { label: "Diproses", colorClass: "bg-blue-100 text-blue-700" },
-    selesai: { label: "Selesai", colorClass: "bg-green-100 text-green-700" },
-    dibatalkan: { label: "Dibatalkan", colorClass: "bg-red-100 text-red-700" },
+    PENDING: { label: "Menunggu Konfirmasi", colorClass: "bg-orange-100 text-orange-700" },
+    CONFIRMED: { label: "Dikonfirmasi", colorClass: "bg-blue-100 text-blue-700" },
+    PROCESSING: { label: "Diproses", colorClass: "bg-indigo-100 text-indigo-700" },
+    COMPLETED: { label: "Selesai", colorClass: "bg-green-100 text-green-700" },
+    CANCELLED: { label: "Dibatalkan", colorClass: "bg-red-100 text-red-700" },
 };
 
 export default function OrderCard({ order }: OrderCardProps) {
     const status = statusConfig[order.status] || { label: order.status, colorClass: "bg-gray-100 text-gray-700" };
 
-    // Using local state to mock review submission for now
     const [isReviewModalOpen, setIsReviewModalOpen] = React.useState(false);
     const [isReviewed, setIsReviewed] = React.useState(false);
+    const [isPaying, startPayTransition] = useTransition();
+    const [isLoadingMethods, startMethodTransition] = useTransition();
+    const [payMethods, setPayMethods] = React.useState<Array<{ code: string; name: string; image: string; fee: string }> | null>(null);
+    const [selectedMethod, setSelectedMethod] = React.useState<string | null>(null);
+    const [payError, setPayError] = React.useState<string | null>(null);
 
-    const handleReviewSubmit = (rating: number, text: string) => {
-        // In a real app, this would be an API call
-        console.log(`Submitting review for order ${order.id}:`, { rating, text });
+    const handleReviewSubmit = async (rating: number, text: string) => {
+        await submitReview(order.id, rating, text);
         setIsReviewed(true);
         setIsReviewModalOpen(false);
+    };
+
+    const handleLoadMethods = () => {
+        startMethodTransition(async () => {
+            try {
+                const result = await getPaymentMethods(order.id);
+                setPayMethods(result);
+            } catch (e) {
+                setPayError(e instanceof Error ? e.message : 'Gagal memuat metode');
+            }
+        });
+    };
+
+    const handlePay = () => {
+        if (!selectedMethod) return;
+        setPayError(null);
+        startPayTransition(async () => {
+            try {
+                const { paymentUrl } = await createPayment(order.id, selectedMethod);
+                window.location.href = paymentUrl;
+            } catch (e) {
+                setPayError(e instanceof Error ? e.message : 'Gagal membuat pembayaran');
+            }
+        });
     };
 
     return (
@@ -46,7 +78,7 @@ export default function OrderCard({ order }: OrderCardProps) {
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-[#f3ede7]">
                 <div className="flex items-center gap-3">
-                    <span className="font-semibold text-secondary">{order.number}</span>
+                    <span className="font-semibold text-secondary">#{order.orderNumber}</span>
                     <span className="text-gray-400 text-sm hidden sm:inline">•</span>
                     <span className="text-sm text-gray-500">
                         {format(new Date(), "dd MMM yyyy", { locale: id })}
@@ -61,7 +93,7 @@ export default function OrderCard({ order }: OrderCardProps) {
             <div className="flex gap-4">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden shrink-0 border border-gray-100">
                     <img
-                        src={order.vendorImage}
+                        src={order.vendorImage ?? '/placeholder-vendor.jpg'}
                         alt={order.vendorName}
                         className="w-full h-full object-cover"
                     />
@@ -99,7 +131,49 @@ export default function OrderCard({ order }: OrderCardProps) {
                     </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                    {order.status === 'selesai' && (
+                    {order.status === 'CONFIRMED' && (
+                        <div className="flex flex-col items-end gap-1 w-full sm:w-auto">
+                            {payError && <p className="text-xs text-red-500">{payError}</p>}
+                            {!payMethods ? (
+                                <button
+                                    onClick={handleLoadMethods}
+                                    disabled={isLoadingMethods}
+                                    className="flex-1 sm:flex-none flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-sm transition-colors disabled:opacity-60"
+                                >
+                                    {isLoadingMethods ? <Loader2 className="w-4 h-4 animate-spin" /> : '💳'}
+                                    {isLoadingMethods ? 'Memuat...' : 'Bayar Sekarang'}
+                                </button>
+                            ) : (
+                                <div className="w-full space-y-2">
+                                    <div className="grid grid-cols-3 gap-1.5">
+                                        {payMethods.map(m => (
+                                            <button
+                                                key={m.code}
+                                                onClick={() => setSelectedMethod(m.code)}
+                                                className={`flex flex-col items-center gap-1 p-2 rounded-lg border text-[10px] font-medium transition-all ${
+                                                    selectedMethod === m.code
+                                                        ? 'border-primary bg-primary/5 text-primary'
+                                                        : 'border-gray-200 text-gray-600'
+                                                }`}
+                                            >
+                                                {m.image && <img src={m.image} alt={m.name} className="h-5 object-contain" />}
+                                                <span className="text-center leading-tight line-clamp-1">{m.name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button
+                                        onClick={handlePay}
+                                        disabled={!selectedMethod || isPaying}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg text-sm transition-colors disabled:opacity-60"
+                                    >
+                                        {isPaying ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                                        {isPaying ? 'Memproses...' : selectedMethod ? '💳 Konfirmasi Bayar' : 'Pilih metode'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    {order.status === 'COMPLETED' && (
                         isReviewed ? (
                             <button disabled className="flex-1 sm:flex-none px-4 py-2 border border-green-200 bg-green-50 text-green-700 font-semibold rounded-lg text-sm cursor-default">
                                 Ulasan Terkirim
@@ -113,7 +187,7 @@ export default function OrderCard({ order }: OrderCardProps) {
                             </button>
                         )
                     )}
-                    {order.status === 'menunggu_konfirmasi' && (
+                    {order.status === 'PENDING' && (
                         <button className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold rounded-lg text-sm transition-colors">
                             Batalkan
                         </button>
@@ -132,8 +206,8 @@ export default function OrderCard({ order }: OrderCardProps) {
                 onClose={() => setIsReviewModalOpen(false)}
                 onSubmit={handleReviewSubmit}
                 vendorName={order.vendorName}
-                vendorImage={order.vendorImage}
-                orderNumber={order.number}
+                vendorImage={order.vendorImage ?? '/placeholder-vendor.jpg'}
+                orderNumber={order.orderNumber}
             />
         </div>
     );

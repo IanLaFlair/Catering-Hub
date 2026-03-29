@@ -51,7 +51,17 @@ export default function NavbarClient({ user }: NavbarClientProps) {
                     {/* Desktop Auth Buttons / User Menu */}
                     <div className="hidden lg:flex items-center gap-3">
                         {user ? (
-                            <UserMenu user={user} />
+                            <>
+                                {(!user.role || user.role === 'CUSTOMER') && (
+                                    <Link
+                                        href="/pesanan"
+                                        className="text-sm font-semibold text-gray-600 hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-gray-50"
+                                    >
+                                        Pesanan Saya
+                                    </Link>
+                                )}
+                                <UserMenu user={user} />
+                            </>
                         ) : (
                             <>
                                 <Link

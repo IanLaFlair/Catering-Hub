@@ -12,7 +12,7 @@ interface VendorCardProps {
     tags: string[];
     price: string;
     priceUnit: string;
-    image: string;
+    image: string | null;
     badge?: 'promoted' | 'verified' | 'partner';
 }
 
@@ -29,7 +29,7 @@ export default function VendorCard({
                     </div>
                 )}
                 <Image
-                    src={image}
+                    src={image ?? '/placeholder-vendor.jpg'}
                     alt={name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"

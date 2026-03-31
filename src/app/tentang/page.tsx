@@ -15,10 +15,8 @@ const stats = [
 ];
 
 const team = [
-    { name: 'Ahmad Fauzi', role: 'CEO & Co-Founder', initial: 'A' },
-    { name: 'Siti Rahayu', role: 'CTO & Co-Founder', initial: 'S' },
-    { name: 'Budi Prasetyo', role: 'Head of Operations', initial: 'B' },
-    { name: 'Dewi Lestari', role: 'Head of Marketing', initial: 'D' },
+    { name: 'Ari Trahtomo', role: 'CEO & Co-Founder', initial: 'A' },
+    { name: 'Ian Rachman Dana', role: 'CTO & Co-Founder', initial: 'I' },
 ];
 
 export default function TentangKamiPage() {
@@ -91,7 +89,7 @@ export default function TentangKamiPage() {
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-14">
                         <h2 className="text-3xl font-extrabold text-[#1b140e] mb-3">Tim Kami</h2>
-                        <p className="text-gray-500">Orang-orang berdedikasi di balik CateringHub.</p>
+                        <p className="text-gray-500">Orang-orang berdedikasi di balik kateringnesia.</p>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                         {team.map((t, i) => (

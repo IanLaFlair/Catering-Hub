@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, X, Loader2 } from 'lucide-react';
+import { Plus, X, Loader2, ImagePlus } from 'lucide-react';
 import { createMenu, updateMenu, MenuFormData } from './actions';
 
 const CATEGORIES = [
@@ -22,7 +22,9 @@ interface Props {
 export default function MenuForm({ menuId, defaultValues }: Props) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
+    const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [name, setName] = useState(defaultValues?.name ?? '');
     const [description, setDescription] = useState(defaultValues?.description ?? '');
@@ -31,6 +33,25 @@ export default function MenuForm({ menuId, defaultValues }: Props) {
     const [minOrderPax, setMinOrderPax] = useState(String(defaultValues?.minOrderPax ?? '50'));
     const [image, setImage] = useState(defaultValues?.image ?? '');
     const [items, setItems] = useState<string[]>(defaultValues?.items?.length ? defaultValues.items : ['']);
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIsUploading(true);
+        setError(null);
+        try {
+            const fd = new FormData();
+            fd.append('file', file);
+            const res = await fetch('/api/upload', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error ?? 'Upload gagal');
+            setImage(data.url);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Upload gagal');
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     const addItem = () => setItems([...items, '']);
     const removeItem = (i: number) => setItems(items.filter((_, idx) => idx !== i));
@@ -188,19 +209,54 @@ export default function MenuForm({ menuId, defaultValues }: Props) {
 
             <div className="bg-white rounded-2xl border border-border-light p-6 space-y-4">
                 <h2 className="font-bold text-text-main">Foto Menu</h2>
-                <div>
-                    <label className={labelClass}>URL Foto</label>
-                    <input
-                        type="url"
-                        value={image}
-                        onChange={e => setImage(e.target.value)}
-                        placeholder="https://..."
-                        className={inputClass}
-                    />
-                    {image && (
-                        <img src={image} alt="preview" className="mt-3 w-32 h-32 object-cover rounded-xl border border-gray-200" />
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={handleFileChange}
+                />
+                <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-colors ${
+                        image ? 'border-primary/30' : 'border-gray-200 hover:border-primary/50'
+                    }`}
+                >
+                    {image ? (
+                        <div className="relative">
+                            <img src={image} alt="preview" className="w-full h-48 object-cover rounded-xl" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+                                <p className="text-white text-sm font-semibold">Klik untuk ganti foto</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+                            {isUploading ? (
+                                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                            ) : (
+                                <>
+                                    <ImagePlus className="w-8 h-8 mb-2" />
+                                    <p className="text-sm font-medium">Klik untuk upload foto</p>
+                                    <p className="text-xs mt-1">JPG, PNG, WebP — maks 5MB</p>
+                                </>
+                            )}
+                        </div>
+                    )}
+                    {isUploading && image && (
+                        <div className="absolute inset-0 bg-white/70 rounded-xl flex items-center justify-center">
+                            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                        </div>
                     )}
                 </div>
+                {image && (
+                    <button
+                        type="button"
+                        onClick={() => setImage('')}
+                        className="text-xs text-red-500 hover:underline"
+                    >
+                        Hapus foto
+                    </button>
+                )}
             </div>
 
             <div className="flex gap-3">

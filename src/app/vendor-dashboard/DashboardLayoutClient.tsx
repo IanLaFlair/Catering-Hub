@@ -8,9 +8,10 @@ import { User } from "next-auth";
 interface DashboardLayoutClientProps {
     children: React.ReactNode;
     user: User & { role?: string };
+    vendorSlug: string | null;
 }
 
-export default function DashboardLayoutClient({ children, user }: DashboardLayoutClientProps) {
+export default function DashboardLayoutClient({ children, user, vendorSlug }: DashboardLayoutClientProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
@@ -18,6 +19,7 @@ export default function DashboardLayoutClient({ children, user }: DashboardLayou
             <VendorSidebar
                 isOpen={isSidebarOpen}
                 onClose={() => setIsSidebarOpen(false)}
+                vendorSlug={vendorSlug}
             />
 
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">

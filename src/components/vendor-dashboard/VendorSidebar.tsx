@@ -8,6 +8,7 @@ import Logo from "@/components/Logo";
 interface VendorSidebarProps {
     isOpen: boolean;
     onClose: () => void;
+    vendorSlug: string | null;
 }
 
 const navItems = [
@@ -17,7 +18,7 @@ const navItems = [
     { label: "Profil Bisnis", href: "/vendor-dashboard/profile", icon: Settings },
 ];
 
-export default function VendorSidebar({ isOpen, onClose }: VendorSidebarProps) {
+export default function VendorSidebar({ isOpen, onClose, vendorSlug }: VendorSidebarProps) {
     const pathname = usePathname();
 
     const sidebarClass = `fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-[#f3ede7] transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${isOpen ? "translate-x-0" : "-translate-x-full"
@@ -80,7 +81,8 @@ export default function VendorSidebar({ isOpen, onClose }: VendorSidebarProps) {
                             Lihat bagaimana profil Anda tampil di mata pelanggan.
                         </p>
                         <Link
-                            href="/"
+                            href={vendorSlug ? `/vendor/${vendorSlug}` : '/cari'}
+                            target="_blank"
                             className="block w-full py-2 text-center text-sm font-semibold text-primary bg-white border border-gray-200 rounded-lg shadow-sm hover:border-primary transition-colors"
                         >
                             Kunjungi Toko

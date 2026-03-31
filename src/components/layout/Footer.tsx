@@ -1,4 +1,5 @@
 import { Facebook, Instagram, Twitter, Lock } from "lucide-react";
+import Logo from "@/components/Logo";
 
 export default function Footer() {
     return (
@@ -7,13 +8,8 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-16">
                     {/* Brand */}
                     <div className="lg:col-span-2">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-8 h-8 text-secondary">
-                                <svg className="w-full h-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor"></path>
-                                </svg>
-                            </div>
-                            <h2 className="text-secondary text-xl font-bold">CateringHub</h2>
+                        <div className="mb-6">
+                            <Logo size={34} />
                         </div>
                         <p className="text-gray-500 mb-6 max-w-sm">
                             Solusi terbaik untuk menemukan dan memesan katering berkualitas untuk berbagai acara spesial Anda di seluruh Indonesia.

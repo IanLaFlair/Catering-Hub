@@ -5,7 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "CateringHub — Temukan Catering Terbaik untuk Acara Anda",
+  title: "kateringnesia — Temukan Catering Terbaik untuk Acara Anda",
   description:
     "Platform marketplace yang menghubungkan customer, vendor catering, dan UMKM kuliner dalam satu ekosistem terpercaya. Temukan catering terbaik di seluruh Indonesia.",
   keywords: [
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     "prasmanan",
   ],
   openGraph: {
-    title: "CateringHub — Temukan Catering Terbaik untuk Acara Anda",
+    title: "kateringnesia — Temukan Catering Terbaik untuk Acara Anda",
     description:
       "Platform marketplace yang menghubungkan customer, vendor catering, dan UMKM kuliner.",
     type: "website",

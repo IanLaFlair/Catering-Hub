@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Check, X, PackageCheck } from 'lucide-react';
-import { approveOrder, rejectOrder, completeOrder } from './actions';
+import { Check, X, PackageCheck, RefreshCw } from 'lucide-react';
+import { approveOrder, rejectOrder, completeOrder, checkPaymentStatus } from './actions';
 
 interface DashboardOrderActionsProps {
     orderId: string;
@@ -12,6 +12,7 @@ interface DashboardOrderActionsProps {
 export default function DashboardOrderActions({ orderId, status }: DashboardOrderActionsProps) {
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
+    const [checkMsg, setCheckMsg] = useState<string | null>(null);
 
     const handle = (action: () => Promise<void>) => {
         setError(null);
@@ -41,6 +42,26 @@ export default function DashboardOrderActions({ orderId, status }: DashboardOrde
                     className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-600 text-white text-xs font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
                 >
                     <Check className="w-3.5 h-3.5" /> Setujui
+                </button>
+            </div>
+        );
+    }
+
+    if (status === 'CONFIRMED') {
+        return (
+            <div className="flex flex-col items-end gap-1">
+                {error && <span className="text-xs text-red-500">{error}</span>}
+                {checkMsg && <span className="text-xs text-green-600">{checkMsg}</span>}
+                <button
+                    onClick={() => handle(async () => {
+                        const result = await checkPaymentStatus(orderId);
+                        setCheckMsg(result.message);
+                    })}
+                    disabled={isPending}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-blue-200 text-blue-600 text-xs font-semibold hover:bg-blue-50 transition-colors disabled:opacity-50"
+                >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isPending ? 'animate-spin' : ''}`} />
+                    Cek Pembayaran
                 </button>
             </div>
         );

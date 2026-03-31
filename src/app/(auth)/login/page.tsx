@@ -1,9 +1,11 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
+import { useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { authenticate } from "../actions";
-import { Loader2 } from "lucide-react";
+import { Loader2, CheckCircle2, X } from "lucide-react";
 
 function LoginButton() {
     const { pending } = useFormStatus();
@@ -26,11 +28,35 @@ function LoginButton() {
     );
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
     const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+    const searchParams = useSearchParams();
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    useEffect(() => {
+        if (searchParams.get('registered') === 'true') {
+            setShowSuccess(true);
+        }
+    }, [searchParams]);
 
     return (
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
+            {/* Success popup */}
+            {showSuccess && (
+                <div className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-5 flex items-start gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                        <p className="font-bold text-green-800">Pendaftaran Berhasil! 🎉</p>
+                        <p className="text-sm text-green-700 mt-0.5">Akun Anda sudah dibuat. Silakan masuk untuk mulai menggunakan kateringnesia.</p>
+                    </div>
+                    <button onClick={() => setShowSuccess(false)} className="text-green-500 hover:text-green-700 shrink-0">
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            )}
+
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold tracking-tight text-gray-900">
                     Selamat Datang Kembali
@@ -116,5 +142,13 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={null}>
+            <LoginPageContent />
+        </Suspense>
     );
 }

@@ -1,5 +1,4 @@
 import { MapPin, Star, BadgeCheck } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 
 interface VendorCardProps {
@@ -22,18 +21,23 @@ export default function VendorCard({
     return (
         <article className={`bg-white border ${badge === 'promoted' ? 'border-primary/30' : 'border-border-light'} rounded-lg shadow-soft hover:shadow-card transition-shadow flex flex-col sm:flex-row overflow-hidden group`}>
             {/* Image */}
-            <div className="relative w-full sm:w-[220px] h-48 sm:h-auto shrink-0 overflow-hidden">
+            <div className="relative w-full sm:w-[220px] h-48 sm:h-auto shrink-0 overflow-hidden bg-orange-50">
                 {badge === 'promoted' && (
                     <div className="absolute top-2 left-2 z-10 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
                         Promoted
                     </div>
                 )}
-                <Image
-                    src={image ?? '/placeholder-vendor.jpg'}
-                    alt={name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {image ? (
+                    <img
+                        src={image}
+                        alt={name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-5xl opacity-20">🍽️</span>
+                    </div>
+                )}
             </div>
 
             {/* Content */}

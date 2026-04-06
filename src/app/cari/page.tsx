@@ -33,18 +33,7 @@ export default async function CariPage({
     const [vendors, total] = await Promise.all([
         prisma.vendorProfile.findMany({
             where,
-            select: {
-                businessName: true,
-                slug: true,
-                city: true,
-                province: true,
-                address: true,
-                description: true,
-                rating: true,
-                priceMin: true,
-                isVerified: true,
-                logo: true,
-                coverImage: true,
+            include: {
                 menus: {
                     where: { isAvailable: true },
                     select: { category: true },
@@ -62,7 +51,7 @@ export default async function CariPage({
     const totalPages = Math.ceil(total / PAGE_SIZE);
 
     const vendorCards = vendors.map((v: typeof vendors[number]) => {
-        const categories = [...new Set(v.menus.map((m: { category: string }) => m.category))];
+        const categories = [...new Set(v.menus.map((m: { category: string }) => m.category as string))];
         const image = v.logo ?? v.coverImage ?? null;
 
         return {

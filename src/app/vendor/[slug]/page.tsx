@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import PhotoGallery from '@/components/vendor/PhotoGallery';
 import VendorHeader from '@/components/vendor/VendorHeader';
 import MenuGrid from '@/components/vendor/MenuGrid';
 import QuotationSidebar from '@/components/vendor/QuotationSidebar';
@@ -27,10 +26,6 @@ export default async function VendorDetailPage({
 
     if (!vendor) notFound();
 
-    const galleryImages = vendor.menus
-        .map((m) => m.image)
-        .filter(Boolean) as string[];
-
     return (
         <main className="w-full max-w-[1440px] mx-auto px-4 lg:px-10 pb-20">
             {/* Breadcrumbs */}
@@ -44,7 +39,20 @@ export default async function VendorDetailPage({
                 <span className="text-accent font-semibold">{vendor.businessName}</span>
             </div>
 
-            <PhotoGallery images={galleryImages} />
+            {/* Cover Image */}
+            <div className="w-full h-[300px] md:h-[400px] rounded-2xl overflow-hidden mb-8 bg-orange-50">
+                {vendor.coverImage ? (
+                    <img
+                        src={vendor.coverImage}
+                        alt={vendor.businessName}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-6xl opacity-30">🍽️</span>
+                    </div>
+                )}
+            </div>
 
             <VendorHeader
                 businessName={vendor.businessName}

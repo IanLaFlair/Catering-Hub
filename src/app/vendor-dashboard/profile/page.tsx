@@ -17,6 +17,7 @@ export default async function ProfilePage() {
             address: true,
             phone: true,
             logo: true,
+            coverImage: true,
             minPax: true,
             maxPax: true,
             priceMin: true,

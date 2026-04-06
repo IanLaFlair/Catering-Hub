@@ -76,6 +76,7 @@ model VendorProfile {
   province    String?
   phone       String?
   logo        String?
+  coverImage  String?
   minPax      Int?
   maxPax      Int?
   priceMin    Int?

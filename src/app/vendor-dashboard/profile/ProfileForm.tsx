@@ -12,6 +12,7 @@ interface VendorProfile {
     address: string | null;
     phone: string | null;
     logo: string | null;
+    coverImage: string | null;
     minPax: number | null;
     maxPax: number | null;
     priceMin: number | null;
@@ -23,8 +24,11 @@ export default function ProfileForm({ profile }: { profile: VendorProfile }) {
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [isCoverUploading, setIsCoverUploading] = useState(false);
     const [logo, setLogo] = useState(profile.logo ?? '');
+    const [coverImage, setCoverImage] = useState(profile.coverImage ?? '');
     const logoInputRef = useRef<HTMLInputElement>(null);
+    const coverInputRef = useRef<HTMLInputElement>(null);
 
     const [form, setForm] = useState({
         businessName: profile.businessName,
@@ -39,23 +43,33 @@ export default function ProfileForm({ profile }: { profile: VendorProfile }) {
         priceMax: String(profile.priceMax ?? ''),
     });
 
+    const uploadFile = async (file: File) => {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch('/api/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? 'Upload gagal');
+        return data.url as string;
+    };
+
     const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         setIsUploading(true);
         setError(null);
-        try {
-            const fd = new FormData();
-            fd.append('file', file);
-            const res = await fetch('/api/upload', { method: 'POST', body: fd });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error ?? 'Upload gagal');
-            setLogo(data.url);
-        } catch (e) {
-            setError(e instanceof Error ? e.message : 'Upload gagal');
-        } finally {
-            setIsUploading(false);
-        }
+        try { setLogo(await uploadFile(file)); }
+        catch (e) { setError(e instanceof Error ? e.message : 'Upload gagal'); }
+        finally { setIsUploading(false); }
+    };
+
+    const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIsCoverUploading(true);
+        setError(null);
+        try { setCoverImage(await uploadFile(file)); }
+        catch (e) { setError(e instanceof Error ? e.message : 'Upload gagal'); }
+        finally { setIsCoverUploading(false); }
     };
 
     const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -75,6 +89,7 @@ export default function ProfileForm({ profile }: { profile: VendorProfile }) {
                     address: form.address,
                     phone: form.phone,
                     logo,
+                    coverImage,
                     minPax: parseInt(form.minPax) || 0,
                     maxPax: parseInt(form.maxPax) || 0,
                     priceMin: parseInt(form.priceMin) || 0,
@@ -148,6 +163,40 @@ export default function ProfileForm({ profile }: { profile: VendorProfile }) {
                             )}
                         </div>
                     </div>
+                </div>
+                <div>
+                    <label className={labelClass}>Foto Cover Toko</label>
+                    <p className="text-xs text-gray-400 mb-2">Foto banner yang tampil di bagian atas halaman toko Anda.</p>
+                    <input
+                        ref={coverInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        onChange={handleCoverChange}
+                    />
+                    <div
+                        onClick={() => coverInputRef.current?.click()}
+                        className="relative cursor-pointer rounded-xl border-2 border-dashed border-gray-200 hover:border-primary/50 overflow-hidden transition-colors h-40"
+                    >
+                        {isCoverUploading ? (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                            </div>
+                        ) : coverImage ? (
+                            <img src={coverImage} alt="cover" className="w-full h-full object-cover" />
+                        ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                                <ImagePlus className="w-7 h-7 mb-1" />
+                                <p className="text-sm">Klik untuk upload foto cover</p>
+                                <p className="text-xs mt-0.5">JPG, PNG, WebP — maks 5MB</p>
+                            </div>
+                        )}
+                    </div>
+                    {coverImage && (
+                        <button type="button" onClick={() => setCoverImage('')} className="text-xs text-red-500 hover:underline mt-1">
+                            Hapus foto cover
+                        </button>
+                    )}
                 </div>
             </div>
 

@@ -46,6 +46,7 @@ export async function createOrder(
             vendorProfileId: vendorId,
             eventType: details.eventType,
             eventDate,
+            eventLocation: details.location,
             guestCount: details.guestCount,
             status: 'PENDING',
             totalAmount: total,

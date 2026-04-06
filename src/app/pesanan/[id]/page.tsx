@@ -109,7 +109,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                 <p className="font-semibold text-[#1b140e]">{order.guestCount.toLocaleString('id-ID')} pax</p>
                             </div>
                         </div>
-                        <div className="flex items-start gap-3 sm:col-span-2">
+                        <div className="flex items-start gap-3">
                             <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
                                 <MapPin className="w-4 h-4 text-primary" />
                             </div>
@@ -118,6 +118,17 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                                 <p className="font-semibold text-[#1b140e]">{order.eventType}</p>
                             </div>
                         </div>
+                        {order.eventLocation && (
+                            <div className="flex items-start gap-3 sm:col-span-2">
+                                <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center shrink-0">
+                                    <MapPin className="w-4 h-4 text-primary" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-500 mb-0.5">Lokasi Acara</p>
+                                    <p className="font-semibold text-[#1b140e]">{order.eventLocation}</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-import { Loader2, CheckCircle2 } from 'lucide-react';
+import { useState, useTransition, useRef } from 'react';
+import { Loader2, CheckCircle2, ImagePlus } from 'lucide-react';
 import { updateProfile } from './actions';
 
 interface VendorProfile {
@@ -11,6 +11,7 @@ interface VendorProfile {
     province: string | null;
     address: string | null;
     phone: string | null;
+    logo: string | null;
     minPax: number | null;
     maxPax: number | null;
     priceMin: number | null;
@@ -21,6 +22,9 @@ export default function ProfileForm({ profile }: { profile: VendorProfile }) {
     const [isPending, startTransition] = useTransition();
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [logo, setLogo] = useState(profile.logo ?? '');
+    const logoInputRef = useRef<HTMLInputElement>(null);
 
     const [form, setForm] = useState({
         businessName: profile.businessName,
@@ -34,6 +38,25 @@ export default function ProfileForm({ profile }: { profile: VendorProfile }) {
         priceMin: String(profile.priceMin ?? ''),
         priceMax: String(profile.priceMax ?? ''),
     });
+
+    const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setIsUploading(true);
+        setError(null);
+        try {
+            const fd = new FormData();
+            fd.append('file', file);
+            const res = await fetch('/api/upload', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error ?? 'Upload gagal');
+            setLogo(data.url);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Upload gagal');
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
         setForm(f => ({ ...f, [key]: e.target.value }));
@@ -51,6 +74,7 @@ export default function ProfileForm({ profile }: { profile: VendorProfile }) {
                     province: form.province,
                     address: form.address,
                     phone: form.phone,
+                    logo,
                     minPax: parseInt(form.minPax) || 0,
                     maxPax: parseInt(form.maxPax) || 0,
                     priceMin: parseInt(form.priceMin) || 0,
@@ -91,6 +115,39 @@ export default function ProfileForm({ profile }: { profile: VendorProfile }) {
                 <div>
                     <label className={labelClass}>Nomor Telepon / WhatsApp</label>
                     <input type="tel" value={form.phone} onChange={set('phone')} placeholder="0812..." className={inputClass} />
+                </div>
+                <div>
+                    <label className={labelClass}>Logo Bisnis</label>
+                    <input
+                        ref={logoInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        onChange={handleLogoChange}
+                    />
+                    <div className="flex items-center gap-4">
+                        <div
+                            onClick={() => logoInputRef.current?.click()}
+                            className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 hover:border-primary/50 cursor-pointer flex items-center justify-center overflow-hidden bg-gray-50 shrink-0 transition-colors"
+                        >
+                            {isUploading ? (
+                                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                            ) : logo ? (
+                                <img src={logo} alt="logo" className="w-full h-full object-cover" />
+                            ) : (
+                                <ImagePlus className="w-6 h-6 text-gray-400" />
+                            )}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                            <p>Klik untuk upload logo bisnis Anda</p>
+                            <p className="text-xs mt-1">JPG, PNG, WebP — maks 5MB</p>
+                            {logo && (
+                                <button type="button" onClick={() => setLogo('')} className="text-xs text-red-500 hover:underline mt-1">
+                                    Hapus logo
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 

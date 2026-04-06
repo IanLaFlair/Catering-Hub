@@ -61,10 +61,17 @@ export default function MenuGrid({ menus, vendorSlug }: MenuGridProps) {
                                 className="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow group flex flex-col h-full"
                             >
                                 <div className="aspect-[4/3] w-full bg-gray-100 relative overflow-hidden">
-                                    <div
-                                        className="w-full h-full bg-center bg-cover transition-transform duration-500 group-hover:scale-110"
-                                        style={{ backgroundImage: `url("${item.image ?? '/placeholder-vendor.jpg'}")` }}
-                                    />
+                                    {item.image ? (
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-orange-50">
+                                            <span className="text-4xl">🍱</span>
+                                        </div>
+                                    )}
                                     <div className="absolute top-3 left-3 bg-white/90 backdrop-blur text-xs font-bold px-2 py-1 rounded text-accent">
                                         {item.category}
                                     </div>

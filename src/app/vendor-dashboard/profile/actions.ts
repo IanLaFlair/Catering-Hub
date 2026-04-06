@@ -12,6 +12,7 @@ export async function updateProfile(data: {
     province: string;
     address: string;
     phone: string;
+    logo: string;
     minPax: number;
     maxPax: number;
     priceMin: number;
@@ -29,6 +30,7 @@ export async function updateProfile(data: {
             province: data.province || null,
             address: data.address || null,
             phone: data.phone || null,
+            logo: data.logo || null,
             minPax: data.minPax || null,
             maxPax: data.maxPax || null,
             priceMin: data.priceMin || null,

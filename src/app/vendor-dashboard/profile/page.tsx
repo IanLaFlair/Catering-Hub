@@ -9,6 +9,19 @@ export default async function ProfilePage() {
 
     const vendor = await prisma.vendorProfile.findUnique({
         where: { userId: session.user.id },
+        select: {
+            businessName: true,
+            description: true,
+            city: true,
+            province: true,
+            address: true,
+            phone: true,
+            logo: true,
+            minPax: true,
+            maxPax: true,
+            priceMin: true,
+            priceMax: true,
+        },
     });
     if (!vendor) redirect('/');
 
